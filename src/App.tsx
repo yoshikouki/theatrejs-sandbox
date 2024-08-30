@@ -5,14 +5,32 @@ import { PerspectiveCamera } from "@theatre/r3f";
 import extension from "@theatre/r3f/dist/extension";
 import studio from "@theatre/studio";
 
-studio.initialize();
-studio.extend(extension);
+import { useEffect } from "react";
+import demoProjectState from "./state.json";
+
+if (import.meta.env.DEV) {
+  studio.initialize();
+  studio.extend(extension);
+}
+
+const demoSheet = getProject("Demo Project", { state: demoProjectState }).sheet(
+  "Demo Sheet",
+);
 
 const App = () => {
+  useEffect(() => {
+    demoSheet.project.ready.then(() =>
+      demoSheet.sequence.play({
+        iterationCount: Number.POSITIVE_INFINITY,
+        range: [0, 4],
+      }),
+    );
+  }, []);
+
   return (
     <main className="h-full w-full">
       <Canvas gl={{ preserveDrawingBuffer: true }}>
-        <SheetProvider sheet={getProject("Demo Project").sheet("Demo Sheet")}>
+        <SheetProvider sheet={demoSheet}>
           <PerspectiveCamera
             theatreKey="Camera"
             makeDefault
